@@ -1,33 +1,20 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
+import LoadingSpinner from '../LoadingSpinner.vue'
+import { useCurriculumStore } from '../../stores/curriculum'
 
-const weeks = [
-  { week: 1, title: 'Git & GitHub Fundamentals', description: 'Version control essentials and collaborative development' },
-  { week: 2, title: 'Project Architecture', description: 'Building scalable and maintainable applications' },
-  { week: 3, title: 'Cloud Deployment', description: 'Understanding cloud platforms and deployment strategies' },
-  { week: 4, title: 'Linode Deep Dive', description: 'Mastering Linode infrastructure and services' },
-  { week: 5, title: 'Docker Essentials', description: 'Containerization basics and best practices' },
-  { week: 6, title: 'Docker Compose', description: 'Multi-container applications and orchestration' },
-  { week: 7, title: 'Nginx & Load Balancing', description: 'Web server configuration and traffic management' },
-  { week: 8, title: 'Feature Flagging', description: 'Implementation and management of feature flags' },
-  { week: 9, title: 'Application Monitoring', description: 'Monitoring tools and performance optimization' },
-  { week: 10, title: 'Telemetry', description: 'Data collection and analysis for better insights' },
-  { week: 11, title: 'CI/CD Pipeline', description: 'Automated testing and deployment workflows' },
-  { week: 12, title: 'Security Best Practices', description: 'Securing applications and infrastructure' },
-  { week: 13, title: 'Final Project', description: 'Putting it all together in a real-world scenario' },
-]
+const curriculumStore = useCurriculumStore()
 
 const target = ref(null)
 const isVisible = ref(false)
-const showAll = ref(false)
-
-const visibleWeeks = computed(() => {
-  return showAll.value ? weeks : weeks.slice(0, 3)
-})
 
 useIntersectionObserver(target, ([{ isIntersecting }]) => {
   isVisible.value = isIntersecting
+})
+
+onMounted(() => {
+  curriculumStore.fetchCurriculum()
 })
 </script>
 
@@ -128,9 +115,16 @@ useIntersectionObserver(target, ([{ isIntersecting }]) => {
         <div class="w-24 h-1 bg-primary/50 mx-auto mt-4 rounded-full"></div>
       </h2>
       <div class="relative max-w-4xl mx-auto" ref="target">
-        <div :class="['timeline-line', { 'fade': !showAll }]"></div>
-        <div class="timeline-container" :style="{ height: `${visibleWeeks.length * 120}px` }">
-          <div v-for="(week, index) in visibleWeeks"
+        <div :class="['timeline-line', { 'fade': !curriculumStore.showAll }]"></div>
+        <div v-if="curriculumStore.isLoading" class="text-center py-16">
+          <LoadingSpinner size="lg" />
+          <p class="mt-4 text-gray-400">Loading curriculum...</p>
+        </div>
+        <div v-else-if="curriculumStore.error" class="text-center py-8 text-red-500">
+          {{ curriculumStore.error }}
+        </div>
+        <div v-else class="timeline-container" :style="{ height: `${curriculumStore.visibleWeeks.length * 120}px` }">
+          <div v-for="(week, index) in curriculumStore.visibleWeeks"
                :key="week.week"
                :class="[
                  'timeline-card',
@@ -154,8 +148,8 @@ useIntersectionObserver(target, ([{ isIntersecting }]) => {
             </div>
           </div>
         </div>
-        <div v-if="!showAll" class="text-center mt-32">
-          <button @click="showAll = true" 
+        <div v-if="!curriculumStore.showAll" class="text-center mt-32">
+          <button @click="curriculumStore.toggleShowAll" 
                   class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-all
                          hover:transform hover:translate-y-[-2px]">
             Load More

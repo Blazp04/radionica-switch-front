@@ -1,53 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { gsap } from 'gsap'
+import { useTerminalStore } from '../../stores/terminal'
 
-const terminalLines = ref([
-  '> Starting deployment process...',
-  '> Initializing Docker containers...',
-  '> Setting up Nginx configuration...',
-  '> Configuring load balancer...',
-  '> Deployment successful! ✨'
-])
-
-const isTyping = ref(false)
-const displayedLines = ref<string[]>([])
-
-const typeLines = async () => {
-  isTyping.value = true
-  displayedLines.value = []
-  
-  for (let i = 0; i < terminalLines.value.length; i++) {
-    const text = terminalLines.value[i]
-    let currentText = ''
-    displayedLines.value.push('')
-    
-    for (let j = 0; j < text.length; j++) {
-      currentText += text[j]
-      displayedLines.value[i] = currentText
-      await new Promise(resolve => setTimeout(resolve, 30))
-    }
-    
-    if (i < terminalLines.value.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, 300))
-    } else {
-      isTyping.value = false
-    }
-  }
-}
-
-const startAnimation = async () => {
-  isTyping.value = true
-  displayedLines.value = []
-  await typeLines()
-  
-  // Restart animation after a delay
-  setTimeout(() => {
-    if (!isTyping.value) {
-      startAnimation()
-    }
-  }, 8000)
-}
+const terminalStore = useTerminalStore()
 
 onMounted(() => {
   gsap.from('.hero-fade', {
@@ -57,7 +13,7 @@ onMounted(() => {
     stagger: 0.2
   })
   
-  startAnimation()
+  terminalStore.startAnimation()
 })
 </script>
 
@@ -116,11 +72,11 @@ onMounted(() => {
 
         <div class="gradient-border p-4 bg-gray-900/50 backdrop-blur-sm hero-fade">
           <div class="font-mono text-sm">
-            <div v-for="(line, index) in displayedLines" 
+            <div v-for="(line, index) in terminalStore.displayedLines" 
                  :key="index"
                  :class="['py-2', 
-                         index === terminalLines.length - 1 ? 'text-accent' : 'text-gray-400',
-                         index === displayedLines.length - 1 && isTyping ? 'cursor' : '',
+                         index === terminalStore.terminalLines.length - 1 ? 'text-accent' : 'text-gray-400',
+                         index === terminalStore.displayedLines.length - 1 && terminalStore.isTyping ? 'cursor' : '',
                          'terminal-line']">
               {{ line }}
             </div>

@@ -1,50 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
+import { useNavigationStore } from '../../stores/navigation'
 
-const navigation = [
-  { name: 'Home', href: '#home' },
-  { name: 'Curriculum', href: '#curriculum' },
-  { name: 'Instructors', href: '#instructors' },
-  { name: 'News', href: '#news' },
-]
-
-const activeSection = ref('')
-const observer = ref<IntersectionObserver | null>(null)
-
-const scrollToSection = (href: string) => {
-  const element = document.querySelector(href)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
-}
+const navigationStore = useNavigationStore()
 
 onMounted(() => {
-  // Set up intersection observer for each section
-  observer.value = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          activeSection.value = `#${entry.target.id}`
-        }
-      })
-    },
-    {
-      rootMargin: '-20% 0px -80% 0px',
-      threshold: [0.2, 0.8]
-    }
-  )
-
-  // Observe all sections
-  navigation.forEach(item => {
-    const section = document.querySelector(item.href)
-    if (section) {
-      observer.value?.observe(section)
-    }
-  })
+  navigationStore.setupObserver()
 })
 
 onUnmounted(() => {
-  observer.value?.disconnect()
+  navigationStore.cleanup()
 })
 </script>
 
@@ -81,19 +46,19 @@ onUnmounted(() => {
     <nav class="container mx-auto px-4 h-16 flex items-center justify-between">
       <a href="/" class="text-xl font-bold">Workshop</a>
       <div class="flex gap-8 items-center">
-        <a v-for="item in navigation" 
+        <a v-for="item in navigationStore.navigation" 
            :key="item.name" 
            :href="item.href"
-           @click.prevent="scrollToSection(item.href)"
+           @click.prevent="navigationStore.scrollToSection(item.href)"
            :class="[
              'nav-link text-gray-400 hover:text-white transition-colors',
-             { 'active': activeSection === item.href }
+             { 'active': navigationStore.activeSection === item.href }
            ]">
           {{ item.name }}
         </a>
       </div>
       <button class="bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-              @click="scrollToSection('#cta')">
+              @click="navigationStore.scrollToSection('#cta')">
         Join Now
       </button>
     </nav>

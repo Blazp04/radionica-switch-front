@@ -1,68 +1,28 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useNewsStore } from '../../stores/news'
+import LoadingSpinner from '../LoadingSpinner.vue'
+import type { NewsItem, NewsCategory } from '../../stores/news'
 
-type NewsCategory = 'announcement' | 'tips' | 'schedule'
+const newsStore = useNewsStore()
 
-const categoryColors = {
+const categoryColors: Record<NewsCategory, string> = {
   announcement: 'text-blue-400 bg-blue-500/10',
   tips: 'text-emerald-400 bg-emerald-500/10',
   schedule: 'text-purple-400 bg-purple-500/10'
-} as const
+}
 
-const selectedNews = ref<typeof news[0] | null>(null)
+const selectedNews = ref<NewsItem | null>(null)
 const isDialogOpen = ref(false)
 
-const news = [
-  {
-    date: '2024-03-15',
-    title: 'New Workshop Dates Announced',
-    description: 'Join our next cohort starting April 1st. Limited spots available.',
-    tag: 'schedule',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop',
-    fullContent: `We're excited to announce our next workshop cohort starting April 1st! This intensive 13-week program will cover everything from basic DevOps principles to advanced cloud infrastructure management.
-
-Key highlights of this cohort:
-• Limited to 20 participants for personalized attention
-• Live coding sessions with industry experts
-• Real-world project implementation
-• Career guidance and networking opportunities
-
-Don't miss this opportunity to accelerate your DevOps career. Early bird registration is now open!`
-  },
-  {
-    date: '2024-03-10',
-    title: 'Student Success Story',
-    description: 'Former student lands senior DevOps position at major tech company.',
-    tag: 'announcement',
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop',
-    fullContent: `We're proud to announce that one of our recent graduates, Sarah Chen, has secured a Senior DevOps position at a leading tech company. Sarah's journey from a traditional system administrator to a DevOps leader is truly inspiring.
-
-"The workshop provided me with not just technical skills, but also the confidence to tackle complex infrastructure challenges," says Sarah. Her success story is a testament to the effectiveness of our practical, hands-on curriculum.
-
-Sarah particularly credits the CI/CD and Kubernetes modules for helping her stand out in the interview process.`
-  },
-  {
-    date: '2024-03-05',
-    title: 'Curriculum Update',
-    description: 'Added new module on Kubernetes and advanced orchestration.',
-    tag: 'tips',
-    image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=800&auto=format&fit=crop',
-    fullContent: `We're constantly evolving our curriculum to keep pace with industry demands. Our latest update includes a comprehensive module on Kubernetes and advanced container orchestration.
-
-New topics covered:
-• Kubernetes architecture and components
-• Deployment strategies and scaling
-• Service mesh implementation
-• Advanced monitoring and troubleshooting
-
-These additions ensure our students are well-prepared for the growing demands of modern cloud-native environments.`
-  }
-]
+onMounted(() => {
+  newsStore.fetchNews()
+})
 
 const scrollContainer = ref<HTMLElement | null>(null)
 
 const getTagClasses = computed(() => (tag: string) => {
-  return `px-4 py-1.5 text-sm rounded-full backdrop-blur-sm ${categoryColors[tag as NewsCategory] || 'text-primary bg-gray-800/50'}`
+  return `px-4 py-1.5 text-sm rounded-full backdrop-blur-sm ${categoryColors[tag as NewsCategory] ?? 'text-primary bg-gray-800/50'}`
 })
 
 const scroll = (direction: 'left' | 'right') => {
@@ -163,7 +123,14 @@ const scroll = (direction: 'left' | 'right') => {
         <!-- News Cards Container -->
         <div ref="scrollContainer" 
              class="news-container flex gap-6 overflow-x-auto snap-x snap-mandatory py-4">
-          <div v-for="item in news" 
+          <div v-if="newsStore.isLoading" class="text-center w-full py-16">
+            <LoadingSpinner size="lg" />
+            <p class="mt-4 text-gray-400">Loading news...</p>
+          </div>
+          <div v-else-if="newsStore.error" class="text-center w-full py-8 text-red-500">
+            {{ newsStore.error }}
+          </div>
+          <div v-else v-for="item in newsStore.news" 
                :key="item.title"
                class="news-card snap-center h-full">
             <div class="bg-gray-900 rounded-lg overflow-hidden border border-white/10 h-full">
