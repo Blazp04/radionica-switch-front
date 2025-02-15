@@ -1,0 +1,232 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+type NewsCategory = 'announcement' | 'tips' | 'schedule'
+
+const categoryColors = {
+  announcement: 'text-blue-400 bg-blue-500/10',
+  tips: 'text-emerald-400 bg-emerald-500/10',
+  schedule: 'text-purple-400 bg-purple-500/10'
+} as const
+
+const selectedNews = ref<typeof news[0] | null>(null)
+const isDialogOpen = ref(false)
+
+const news = [
+  {
+    date: '2024-03-15',
+    title: 'New Workshop Dates Announced',
+    description: 'Join our next cohort starting April 1st. Limited spots available.',
+    tag: 'schedule',
+    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop',
+    fullContent: `We're excited to announce our next workshop cohort starting April 1st! This intensive 13-week program will cover everything from basic DevOps principles to advanced cloud infrastructure management.
+
+Key highlights of this cohort:
+• Limited to 20 participants for personalized attention
+• Live coding sessions with industry experts
+• Real-world project implementation
+• Career guidance and networking opportunities
+
+Don't miss this opportunity to accelerate your DevOps career. Early bird registration is now open!`
+  },
+  {
+    date: '2024-03-10',
+    title: 'Student Success Story',
+    description: 'Former student lands senior DevOps position at major tech company.',
+    tag: 'announcement',
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop',
+    fullContent: `We're proud to announce that one of our recent graduates, Sarah Chen, has secured a Senior DevOps position at a leading tech company. Sarah's journey from a traditional system administrator to a DevOps leader is truly inspiring.
+
+"The workshop provided me with not just technical skills, but also the confidence to tackle complex infrastructure challenges," says Sarah. Her success story is a testament to the effectiveness of our practical, hands-on curriculum.
+
+Sarah particularly credits the CI/CD and Kubernetes modules for helping her stand out in the interview process.`
+  },
+  {
+    date: '2024-03-05',
+    title: 'Curriculum Update',
+    description: 'Added new module on Kubernetes and advanced orchestration.',
+    tag: 'tips',
+    image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=800&auto=format&fit=crop',
+    fullContent: `We're constantly evolving our curriculum to keep pace with industry demands. Our latest update includes a comprehensive module on Kubernetes and advanced container orchestration.
+
+New topics covered:
+• Kubernetes architecture and components
+• Deployment strategies and scaling
+• Service mesh implementation
+• Advanced monitoring and troubleshooting
+
+These additions ensure our students are well-prepared for the growing demands of modern cloud-native environments.`
+  }
+]
+
+const scrollContainer = ref<HTMLElement | null>(null)
+
+const getTagClasses = computed(() => (tag: string) => {
+  return `px-4 py-1.5 text-sm rounded-full backdrop-blur-sm ${categoryColors[tag as NewsCategory] || 'text-primary bg-gray-800/50'}`
+})
+
+const scroll = (direction: 'left' | 'right') => {
+  if (!scrollContainer.value) return
+  
+  const scrollAmount = direction === 'left' ? -400 : 400
+  scrollContainer.value.scrollBy({
+    left: scrollAmount,
+    behavior: 'smooth'
+  })
+}
+</script>
+
+<style scoped>
+.news-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.news-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-button {
+  @apply absolute top-1/2 -translate-y-1/2 bg-black/80 text-white w-10 h-10 
+         flex items-center justify-center rounded-full z-10
+         hover:bg-black transition-colors duration-200
+         backdrop-blur-sm border border-white/10;
+}
+
+.news-card {
+  min-width: 400px;
+  transition: transform 0.3s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+}
+
+.dialog-overlay {
+  @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-50
+         flex items-center justify-center p-8;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dialog-content {
+  @apply bg-gray-900/95 backdrop-blur-md rounded-2xl w-full max-w-2xl
+         transform transition-all max-h-[85vh] flex flex-col
+         border border-white/10 shadow-2xl;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.card-content {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  height: 100%;
+}
+</style>
+
+<template>
+  <section id="news" class="py-32">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center mb-16">
+        Latest News
+        <div class="w-24 h-1 bg-blue-500/50 mx-auto mt-4 rounded-full"></div>
+      </h2>
+      <div class="relative max-w-7xl mx-auto">
+        <!-- Navigation Buttons -->
+        <button @click="scroll('left')" 
+                class="scroll-button left-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button @click="scroll('right')" 
+                class="scroll-button right-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <!-- News Cards Container -->
+        <div ref="scrollContainer" 
+             class="news-container flex gap-6 overflow-x-auto snap-x snap-mandatory py-4">
+          <div v-for="item in news" 
+               :key="item.title"
+               class="news-card snap-center h-full">
+            <div class="bg-gray-900 rounded-lg overflow-hidden border border-white/10 h-full">
+              <img :src="item.image" 
+                   :alt="item.title"
+                   class="w-full h-48 object-cover" />
+              <div class="p-6 card-content">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-base text-gray-400">{{ new Date(item.date).toLocaleDateString() }}</span>
+                  <span :class="getTagClasses(item.tag)">{{ item.tag }}</span>
+                </div>
+                <h3 class="text-xl font-medium mb-3">{{ item.title }}</h3>
+                <p class="text-gray-400 text-base mb-4">{{ item.description }}</p>
+                <button @click="selectedNews = item; isDialogOpen = true"
+                        class="text-primary hover:text-white transition-colors flex items-center gap-2 text-sm mt-auto">
+                  Read More
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- News Dialog -->
+    <Teleport to="body">
+      <div v-if="isDialogOpen" 
+           class="dialog-overlay"
+           @click="isDialogOpen = false">
+        <div class="dialog-content" 
+             @click.stop>
+          <div class="relative">
+            <img :src="selectedNews?.image" 
+                 :alt="selectedNews?.title"
+                 class="w-full h-52 object-cover rounded-t-2xl" />
+            <button @click="isDialogOpen = false"
+                    class="absolute top-4 right-4 bg-black/50 hover:bg-black/80 w-8 h-8 
+                           rounded-full flex items-center justify-center backdrop-blur-sm
+                           border border-white/10 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="p-6 overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-base text-gray-400">
+                {{ new Date(selectedNews?.date || '').toLocaleDateString() }}
+              </span>
+              <span :class="getTagClasses(selectedNews?.tag || '')">
+                {{ selectedNews?.tag }}
+              </span>
+            </div>
+            <h2 class="text-2xl font-bold mb-4">{{ selectedNews?.title }}</h2>
+            <div class="text-gray-400 whitespace-pre-line leading-relaxed">
+              {{ selectedNews?.fullContent }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+  </section>
+</template>
