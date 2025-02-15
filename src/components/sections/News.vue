@@ -132,8 +132,10 @@ const scroll = (direction: 'left' | 'right') => {
           </div>
           <div v-else v-for="item in newsStore.news" 
                :key="item.title"
-               class="news-card snap-center h-full">
-            <div class="bg-gray-900 rounded-lg overflow-hidden border border-white/10 h-full">
+               class="news-card snap-center h-full cursor-pointer"
+               @click="selectedNews = item; isDialogOpen = true">
+            <div class="bg-gray-900 rounded-lg overflow-hidden border border-white/10 h-full
+                        hover:border-white/20 transition-colors">
               <img :src="item.image" 
                    :alt="item.title"
                    class="w-full h-48 object-cover" />
@@ -144,13 +146,12 @@ const scroll = (direction: 'left' | 'right') => {
                 </div>
                 <h3 class="text-xl font-medium mb-3">{{ item.title }}</h3>
                 <p class="text-gray-400 text-base mb-4">{{ item.description }}</p>
-                <button @click="selectedNews = item; isDialogOpen = true"
-                        class="text-primary hover:text-white transition-colors flex items-center gap-2 text-sm mt-auto">
+                <div class="text-primary group-hover:text-white transition-colors flex items-center gap-2 text-sm mt-auto">
                   Read More
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>
-                </button>
+                </div>
               </div>
             </div>
           </div>
