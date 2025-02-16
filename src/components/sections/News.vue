@@ -115,12 +115,14 @@ const scroll = (direction: 'left' | 'right') => {
       <div class="relative max-w-7xl mx-auto">
         <!-- Navigation Buttons -->
         <button @click="scroll('left')" 
+                v-if="newsStore.news.length > 0"
                 class="scroll-button left-2 hidden sm:flex">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button @click="scroll('right')" 
+                v-if="newsStore.news.length > 0"
                 class="scroll-button right-2 hidden sm:flex">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -133,6 +135,39 @@ const scroll = (direction: 'left' | 'right') => {
           <div v-if="newsStore.isLoading" class="text-center w-full py-16">
             <LoadingSpinner size="lg" />
             <p class="mt-4 text-gray-400">Loading news...</p>
+          </div>
+          <div v-else-if="!newsStore.news.length" 
+               class="w-full flex flex-col items-center justify-center py-16 px-4">
+            <div class="w-16 h-16 mb-6 rounded-full bg-gray-800 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="w-8 h-8 text-gray-400" 
+                   fill="none" 
+                   viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-medium mb-2 text-center">No News Yet</h3>
+            <p class="text-gray-400 text-center max-w-md mb-8">
+              Stay tuned! We'll be sharing exciting updates, student success stories, 
+              and workshop announcements here soon.
+            </p>
+            <div class="flex gap-2 items-center text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="w-5 h-5" 
+                   fill="none" 
+                   viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span>Subscribe to Updates</span>
+            </div>
           </div>
           <div v-else-if="newsStore.error" class="text-center w-full py-8 text-red-500">
             {{ newsStore.error }}
