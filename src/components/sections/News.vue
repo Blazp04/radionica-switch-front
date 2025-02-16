@@ -54,8 +54,15 @@ const scroll = (direction: 'left' | 'right') => {
 }
 
 .news-card {
-  min-width: 400px;
+  min-width: calc(100vw - 2rem);
+  max-width: 400px;
   transition: transform 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .news-card {
+    min-width: 400px;
+  }
 }
 
 .news-card:hover {
@@ -64,7 +71,7 @@ const scroll = (direction: 'left' | 'right') => {
 
 .dialog-overlay {
   @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-50
-         flex items-center justify-center p-8;
+         flex items-center justify-center p-4 sm:p-8;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -108,13 +115,13 @@ const scroll = (direction: 'left' | 'right') => {
       <div class="relative max-w-7xl mx-auto">
         <!-- Navigation Buttons -->
         <button @click="scroll('left')" 
-                class="scroll-button left-2">
+                class="scroll-button left-2 hidden sm:flex">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button @click="scroll('right')" 
-                class="scroll-button right-2">
+                class="scroll-button right-2 hidden sm:flex">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -122,7 +129,7 @@ const scroll = (direction: 'left' | 'right') => {
 
         <!-- News Cards Container -->
         <div ref="scrollContainer" 
-             class="news-container flex gap-6 overflow-x-auto snap-x snap-mandatory py-4">
+             class="news-container flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory py-4 px-4 -mx-4 sm:px-0 sm:mx-0">
           <div v-if="newsStore.isLoading" class="text-center w-full py-16">
             <LoadingSpinner size="lg" />
             <p class="mt-4 text-gray-400">Loading news...</p>

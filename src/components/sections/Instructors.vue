@@ -19,13 +19,14 @@ const instructors = [
 .instructor-card {
   position: relative;
   transition: transform 0.3s ease;
+  height: fit-content;
 }
 
 .instructor-card::before {
   content: '';
   position: absolute;
   inset: -2px;
-  background: #3b82f6;
+  background: var(--instructor-blue);
   border-radius: 0.5rem;
   z-index: -1;
   opacity: 0;
@@ -39,9 +40,7 @@ const instructors = [
 .instructor-card:hover::before {
   opacity: 0.5;
   box-shadow: 
-    10 10 1px #3b82f6,
-    10 10 2px #3b82f6,
-    10 10 1px #3b82f6;
+    0 0 15px var(--instructor-blue);
   animation: neonPulse 1.5s ease-in-out infinite;
 }
 
@@ -69,11 +68,11 @@ const instructors = [
         <div v-for="instructor in instructors" 
              :key="instructor.name" 
              class="instructor-card">
-          <div class="bg-gray-900 rounded-lg p-8">
+          <div class="bg-gray-900 rounded-lg p-6 sm:p-8">
             <img :src="instructor.image" 
                  :alt="instructor.name" 
                  class="w-24 h-24 rounded-full object-cover mb-6" />
-            <h3 class="text-xl font-medium mb-2">{{ instructor.name }}</h3>
+            <h3 class="text-lg sm:text-xl font-medium mb-2">{{ instructor.name }}</h3>
             <p class="text-gray-400 text-sm mb-4">{{ instructor.role }}</p>
             <p class="text-gray-500 text-sm">{{ instructor.bio }}</p>
           </div>

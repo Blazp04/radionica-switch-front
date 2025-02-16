@@ -50,21 +50,21 @@ onMounted(() => {
       <div v-for="n in 24" :key="n" class="h-full bg-white"></div>
     </div>
 
-    <div class="container mx-auto px-16">
-      <div class="grid lg:grid-cols-2 gap-12 items-center">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-16">
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         <div class="text-left hero-fade">
-          <span class="text-primary font-mono text-sm tracking-wider mb-4 block">13-WEEK INTENSIVE WORKSHOP</span>
-          <h1 class="text-5xl font-bold mb-6">
+          <span class="text-primary font-mono text-xs sm:text-sm tracking-wider mb-4 block">13-WEEK INTENSIVE WORKSHOP</span>
+          <h1 class="text-4xl sm:text-5xl font-bold mb-6">
             From Idea to Production
           </h1>
-          <p class="text-gray-400 mb-8 text-lg">
+          <p class="text-gray-400 mb-8 text-base sm:text-lg">
             Master modern software development with industry experts. Learn everything from Git to production deployment.
           </p>
-          <div class="flex gap-4">
-            <button class="bg-white text-black hover:bg-gray-100 px-6 py-3 rounded-lg transition-colors">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button class="bg-white text-black hover:bg-gray-100 px-6 py-3 rounded-lg transition-colors w-full sm:w-auto text-center">
               Join Workshop
             </button>
-            <button class="text-gray-400 px-6 py-3 hover:text-white transition-colors">
+            <button class="text-gray-400 px-6 py-3 hover:text-white transition-colors w-full sm:w-auto text-center">
               Learn More →
             </button>
           </div>

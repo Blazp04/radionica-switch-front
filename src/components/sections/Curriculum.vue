@@ -21,9 +21,16 @@ onMounted(() => {
 <style scoped>
 .timeline-card {
   position: relative;
-  width: calc(50% - 2rem);
-  margin-bottom: 1rem;
+  width: 100%;
+  padding-left: 3rem;
   transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .timeline-card {
+    width: calc(50% - 2rem);
+    padding-left: 0;
+  }
 }
 
 .timeline-card:hover {
@@ -36,19 +43,21 @@ onMounted(() => {
   width: 1rem;
   height: 1rem;
   background: var(--primary);
-  border-radius: 50%;
-  top: 1.5rem;
+  border-radius: 9999px;
+  top: 2rem;
+  left: 0;
   transition: all 0.3s ease;
 }
 
-.timeline-card.left::before {
-  right: -2rem;
-  transform: translateY(0);
-}
-
-.timeline-card.right::before {
-  left: -2rem;
-  transform: translateY(0);
+@media (min-width: 768px) {
+  .timeline-card.left::before {
+    left: auto;
+    right: -2rem;
+  }
+  
+  .timeline-card.right::before {
+    left: -2rem;
+  }
 }
 
 .timeline-card.right {
@@ -85,11 +94,17 @@ onMounted(() => {
 
 .timeline-line {
   position: absolute;
-  left: 50%;
+  left: 1.5rem;
   height: 100%;
   width: 2px;
   transform: translateX(-50%);
   background: var(--primary);
+}
+
+@media (min-width: 768px) {
+  .timeline-line {
+    left: 50%;
+  }
 }
 
 .timeline-line.fade {
@@ -109,8 +124,8 @@ onMounted(() => {
 
 <template>
   <section id="curriculum" class="py-32 bg-black/30">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold text-center mb-16">
+    <div class="container mx-auto px-4 overflow-hidden">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center mb-16">
         13-Week Curriculum
         <div class="w-24 h-1 bg-primary/50 mx-auto mt-4 rounded-full"></div>
       </h2>
@@ -128,21 +143,21 @@ onMounted(() => {
                :key="week.week"
                :class="[
                  'timeline-card',
-                 index % 2 === 0 ? 'left-0 left' : 'right-0 right',
+                 'md:' + (index % 2 === 0 ? 'left-0 left' : 'right-0 right'),
                  isVisible ? 'opacity-100' : 'opacity-0',
                  'absolute'
                ]"
                :style="{
                  top: `${index * 120}px`,
                  transitionDelay: `${index * 100}ms`,
-                 transform: `translateY(${isVisible ? '0' : (index % 2 === 0 ? '-20px' : '20px')})`
+                 transform: `translateY(${isVisible ? '0' : '-20px'})`
                }">
             <div class="timeline-card-content p-5 h-full">
               <div class="flex flex-col gap-2">
                 <span class="text-xl font-mono text-primary/60">
                   {{ week.week.toString().padStart(2, '0') }}
                 </span>
-                <h3 class="font-medium text-lg">{{ week.title }}</h3>
+                <h3 class="font-medium text-base sm:text-lg">{{ week.title }}</h3>
                 <p class="text-sm text-gray-400">{{ week.description }}</p>
               </div>
             </div>

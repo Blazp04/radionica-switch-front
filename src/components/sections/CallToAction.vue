@@ -28,24 +28,24 @@ useIntersectionObserver(target, ([{ isIntersecting }]) => {
           LIMITED SPOTS AVAILABLE
         </span>
         
-        <h2 class="text-5xl font-bold mb-6">
+        <h2 class="text-4xl sm:text-5xl font-bold mb-6">
           Ready to Transform Your Career?
         </h2>
         
-        <p class="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
+        <p class="text-gray-400 text-base sm:text-lg mb-10 max-w-2xl mx-auto px-4 sm:px-0">
           Join our intensive workshop and master modern software development. 
           Next cohort starts soon.
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button class="group relative px-8 py-4 bg-white text-black rounded-lg overflow-hidden">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center px-4 sm:px-0">
+          <button class="group relative px-8 py-4 bg-white text-black rounded-lg overflow-hidden w-full sm:w-auto">
             <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-0 
                         group-hover:opacity-10 transition-opacity duration-300"></div>
             <span class="relative font-medium text-lg">Apply Now</span>
           </button>
           
           <a href="#curriculum" 
-             class="text-gray-400 px-6 py-4 hover:text-white transition-colors flex items-center gap-2">
+             class="text-gray-400 px-6 py-4 hover:text-white transition-colors flex items-center gap-2 justify-center w-full sm:w-auto">
             View Curriculum
             <svg xmlns="http://www.w3.org/2000/svg" 
                  class="w-4 h-4 transition-transform group-hover:translate-x-1" 
@@ -59,7 +59,7 @@ useIntersectionObserver(target, ([{ isIntersecting }]) => {
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 mt-16 max-w-2xl mx-auto px-4 sm:px-0">
           <div class="text-center">
             <div class="text-3xl font-bold text-white mb-2">13</div>
             <div class="text-gray-400 text-sm">Weeks Intensive</div>
