@@ -1,56 +1,56 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
-export const useNavigationStore = defineStore('navigation', () => {
+export const useNavigationStore = defineStore("navigation", () => {
   const navigation = [
-    { name: 'Home', href: '#home' },
-    { name: 'Curriculum', href: '#curriculum' },
-    { name: 'Instructors', href: '#instructors' },
-    { name: 'News', href: '#news' },
-  ]
+    { name: "Početna", href: "#home" },
+    { name: "Kurikulum", href: "#curriculum" },
+    { name: "Predavači", href: "#instructors" },
+    { name: "Novosti", href: "#news" },
+  ];
 
-  const activeSection = ref('')
-  const observer = ref<IntersectionObserver | null>(null)
+  const activeSection = ref("");
+  const observer = ref<IntersectionObserver | null>(null);
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href)
+    const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      element.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   const setupObserver = () => {
     observer.value = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            activeSection.value = `#${entry.target.id}`
+            activeSection.value = `#${entry.target.id}`;
           }
-        })
+        });
       },
       {
-        rootMargin: '-20% 0px -80% 0px',
-        threshold: [0.2, 0.8]
+        rootMargin: "-20% 0px -80% 0px",
+        threshold: [0.2, 0.8],
       }
-    )
+    );
 
-    navigation.forEach(item => {
-      const section = document.querySelector(item.href)
+    navigation.forEach((item) => {
+      const section = document.querySelector(item.href);
       if (section) {
-        observer.value?.observe(section)
+        observer.value?.observe(section);
       }
-    })
-  }
+    });
+  };
 
   const cleanup = () => {
-    observer.value?.disconnect()
-  }
+    observer.value?.disconnect();
+  };
 
   return {
     navigation,
     activeSection,
     scrollToSection,
     setupObserver,
-    cleanup
-  }
-})
+    cleanup,
+  };
+});

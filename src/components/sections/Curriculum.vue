@@ -54,7 +54,7 @@ onMounted(() => {
     left: auto;
     right: -2rem;
   }
-  
+
   .timeline-card.right::before {
     left: -2rem;
   }
@@ -82,7 +82,7 @@ onMounted(() => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(var(--gradient-angle), var(--primary), transparent);
+  background: linear-gradient(var(--gradient-showAll), var(--primary), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -108,11 +108,9 @@ onMounted(() => {
 }
 
 .timeline-line.fade {
-  background: linear-gradient(
-    to bottom,
-    var(--primary) 70%,
-    transparent
-  );
+  background: linear-gradient(to bottom,
+      var(--primary) 70%,
+      transparent);
 }
 
 .timeline-container {
@@ -126,32 +124,29 @@ onMounted(() => {
   <section id="curriculum" class="py-32 bg-black/30">
     <div class="container mx-auto px-4 overflow-hidden">
       <h2 class="text-3xl sm:text-4xl font-bold text-center mb-16">
-        13-Week Curriculum
+        13-Tjedni Plan i Program
         <div class="w-24 h-1 bg-primary/50 mx-auto mt-4 rounded-full"></div>
       </h2>
       <div class="relative max-w-4xl mx-auto" ref="target">
         <div :class="['timeline-line', { 'fade': !curriculumStore.showAll }]"></div>
         <div v-if="curriculumStore.isLoading" class="text-center py-16">
           <LoadingSpinner size="lg" />
-          <p class="mt-4 text-gray-400">Loading curriculum...</p>
+          <p class="mt-4 text-gray-400">Učitavanje...</p>
         </div>
         <div v-else-if="curriculumStore.error" class="text-center py-8 text-red-500">
           {{ curriculumStore.error }}
         </div>
-        <div v-else class="timeline-container" :style="{ height: `${curriculumStore.visibleWeeks.length * 120}px` }">
-          <div v-for="(week, index) in curriculumStore.visibleWeeks"
-               :key="week.week"
-               :class="[
-                 'timeline-card',
-                 'md:' + (index % 2 === 0 ? 'left-0 left' : 'right-0 right'),
-                 isVisible ? 'opacity-100' : 'opacity-0',
-                 'absolute'
-               ]"
-               :style="{
-                 top: `${index * 120}px`,
-                 transitionDelay: `${index * 100}ms`,
-                 transform: `translateY(${isVisible ? '0' : '-20px'})`
-               }">
+        <div v-else class="timeline-container" :style="{ height: `${curriculumStore.visibleWeeks.length * 15.3}rem` }">
+          <div v-for="(week, index) in curriculumStore.visibleWeeks" :key="week.week" :class="[
+            'timeline-card',
+            'md:' + (index % 2 === 0 ? 'left-0 left' : 'right-0 right'),
+            isVisible ? 'opacity-100' : 'opacity-0',
+            'absolute'
+          ]" :style="{
+            top: `${index * 120}px`,
+            transitionDelay: `${index * 100}ms`,
+            transform: `translateY(${isVisible ? '0' : '-20px'})`
+          }">
             <div class="timeline-card-content p-5 h-full">
               <div class="flex flex-col gap-2">
                 <span class="text-xl font-mono text-primary/60">
@@ -164,10 +159,9 @@ onMounted(() => {
           </div>
         </div>
         <div v-if="!curriculumStore.showAll" class="text-center mt-32">
-          <button @click="curriculumStore.toggleShowAll" 
-                  class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-all
+          <button @click="curriculumStore.toggleShowAll" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-all
                          hover:transform hover:translate-y-[-2px]">
-            Load More
+            Učitaj više
           </button>
         </div>
       </div>
