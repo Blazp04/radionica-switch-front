@@ -2,7 +2,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useNewsStore } from '../../stores/news'
 import LoadingSpinner from '../LoadingSpinner.vue'
-import type { NewsItem, NewsCategory } from '../../stores/news'
+import type { NewsCategory } from '../../model/local/NewsCategoryEnum'
+import type { NewsItem } from '../../model/local/NewsItemModel'
 
 const newsStore = useNewsStore()
 

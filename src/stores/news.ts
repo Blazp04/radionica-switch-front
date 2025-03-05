@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { NewsItem } from "../model/local/NewsItemModel";
-import type { NewsResponseModel } from "../model/response/NewsResponseModel";
 import { fetchAllNews, postNews } from "../repository/news_repository";
 import type { NewsRequestModel } from "../model/request/NewsRequestModel";
 
