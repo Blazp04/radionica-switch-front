@@ -55,7 +55,7 @@ onMounted(() => {
         <div class="text-left hero-fade">
           <span class="text-primary font-mono text-xs sm:text-sm tracking-wider mb-4 block">13-TJEDNA RADIONICA</span>
           <h1 class="text-4xl sm:text-5xl font-bold mb-6">
-            Od Idje do Produkcije
+            Od ideje do Produkcije
           </h1>
           <p class="text-gray-400 mb-8 text-base sm:text-lg">
             Postani majstor moderne razvoja softvera uz pomoć stručnjaka iz industrije. Nauči sve od Git-a do
