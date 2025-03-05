@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useNewsStore } from '../../stores/news'
-import type { NewsItem } from '../../stores/news'
 import LoadingSpinner from '../../components/LoadingSpinner.vue'
 import { computed } from 'vue'
+import type { NewsItem } from '../../model/local/NewsItemModel'
+import type { NewsRequestModel } from '../../model/request/NewsRequestModel'
 
 const tagOptions = [
   { value: 'announcement', label: 'Announcement', color: 'text-blue-400 bg-blue-500/10' },
@@ -92,12 +93,17 @@ const handleSave = async () => {
 }
 
 const handleCreate = async () => {
+  console.log(newItem.value)
   if (newItem.value.title && newItem.value.description) {
-    await newsStore.createNews({
-      ...newItem.value,
-      date: new Date().toISOString(),
-    } as NewsItem)
-    
+    let news: NewsRequestModel = {
+      title: newItem.value.title,
+      content: newItem.value.fullContent ?? '',
+      category: newItem.value.tag ?? 'announcement',
+      image_path: newItem.value.image ?? '',
+    }
+
+    await newsStore.addNewNews(news)
+
     newItem.value = {
       title: '',
       description: '',
@@ -107,14 +113,17 @@ const handleCreate = async () => {
     }
   }
 }
+
+onMounted(() => {
+  newsStore.fetchNews()
+})
 </script>
 
 <template>
   <div>
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-2xl font-bold">News Manager</h1>
-      <button 
-        @click="isEditing = !isEditing"
+      <button @click="isEditing = !isEditing"
         class="px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors">
         {{ isEditing ? 'Cancel' : 'Add News' }}
       </button>
@@ -126,41 +135,26 @@ const handleCreate = async () => {
       <form @submit.prevent="editingItem ? handleSave() : handleCreate()" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Title</label>
-          <input
-            v-model="title"
-            type="text"
-            required
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          />
+          <input v-model="title" type="text" required class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Description</label>
-          <input
-            v-model="description"
-            type="text"
-            required
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          />
+          <input v-model="description" type="text" required class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Tag</label>
           <div class="grid grid-cols-3 gap-3">
-            <button
-              v-for="option in tagOptions"
-              :key="option.value"
-              type="button"
-              @click="tag = option.value as 'announcement' | 'tips' | 'schedule'"
-              :class="[
+            <button v-for="option in tagOptions" :key="option.value" type="button"
+              @click="tag = option.value as 'announcement' | 'tips' | 'schedule'" :class="[
                 'px-4 py-2 rounded-lg transition-all duration-200 border backdrop-blur-sm',
                 tag === option.value
                   ? `${option.color} border-current`
                   : 'border-gray-800 text-gray-400 hover:border-gray-700'
-              ]"
-            >
+              ]">
               {{ option.label }}
             </button>
           </div>
@@ -168,32 +162,18 @@ const handleCreate = async () => {
 
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Image URL</label>
-          <input
-            v-model="image"
-            type="url"
-            required
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          />
+          <input v-model="image" type="url" required class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Full Content</label>
-          <textarea
-            v-model="fullContent"
-            rows="5"
-            required
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          ></textarea>
+          <textarea v-model="fullContent" rows="5" required class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors"></textarea>
         </div>
 
-        <button
-          type="submit"
-          :disabled="newsStore.isLoading"
-          class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg
-                 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button type="submit" :disabled="newsStore.isLoading" class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg
+                 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <span v-if="!newsStore.isLoading">{{ editingItem ? 'Save Changes' : 'Create News' }}</span>
           <LoadingSpinner v-else size="sm" />
         </button>
@@ -205,19 +185,15 @@ const handleCreate = async () => {
       <LoadingSpinner size="lg" />
       <p class="mt-4 text-gray-400">Loading news...</p>
     </div>
-    
+
     <div v-else class="space-y-4">
-      <div v-for="item in newsStore.news" 
-           :key="item.title"
-           class="bg-gray-900/50 backdrop-blur-sm p-6 rounded-lg border border-gray-800
+      <div v-for="item in newsStore.news" :key="item.title" class="bg-gray-900/50 backdrop-blur-sm p-6 rounded-lg border border-gray-800
                   flex items-center justify-between">
         <div>
           <h3 class="font-medium mb-2">{{ item.title }}</h3>
           <p class="text-gray-400 text-sm">{{ item.description }}</p>
         </div>
-        <button 
-          @click="handleEdit(item)"
-          class="px-4 py-2 text-primary hover:text-white transition-colors">
+        <button @click="handleEdit(item)" class="px-4 py-2 text-primary hover:text-white transition-colors">
           Edit
         </button>
       </div>

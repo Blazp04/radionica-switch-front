@@ -9,6 +9,7 @@ async function signIn(email: string, password: string): Promise<string> {
     const response = await apiConfig.post("auth/login", payload);
     const data = response.data;
     const token = data.access_token;
+    localStorage.setItem("access_token", token);
     return token;
   } catch (e) {
     throw e;

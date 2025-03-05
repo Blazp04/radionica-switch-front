@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import type { CurriculumWeek } from "../model/local/CurriculumWeekModel";
-import { fetchAllCurriculum } from "../repository/cirriculumRepository";
+import {
+  fetchAllCurriculum,
+  postCurriculum,
+} from "../repository/cirriculumRepository";
+import type { CurriculumWeekRequestModel } from "../model/request/CurriculumWeekRequestModel";
 
 export const useCurriculumStore = defineStore("curriculum", () => {
   const weeks = ref<CurriculumWeek[]>([]);
@@ -10,14 +14,12 @@ export const useCurriculumStore = defineStore("curriculum", () => {
   const error = ref<string | null>(null);
   const showAll = ref(false);
 
-  const createWeek = async (week: CurriculumWeek) => {
-    isLoading.value = true;
-    error.value = null;
-
+  const createWeek = async (week: CurriculumWeekRequestModel) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      weeks.value.push(week);
-      weeks.value.sort((a, b) => a.week - b.week);
+      await postCurriculum(week);
+      fetchCurriculum();
+      isLoading.value = true;
+      error.value = null;
     } catch (e) {
       error.value = "Failed to create week";
     } finally {

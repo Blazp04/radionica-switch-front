@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useCurriculumStore } from '../../stores/curriculum'
-import type { CurriculumWeek } from '../../stores/curriculum'
 import LoadingSpinner from '../../components/LoadingSpinner.vue'
 import { computed } from 'vue'
+import type { CurriculumWeek } from '../../model/local/CurriculumWeekModel'
+import type { CurriculumWeekRequestModel } from '../../model/request/CurriculumWeekRequestModel'
 
 const curriculumStore = useCurriculumStore()
 const isEditing = ref(false)
@@ -16,12 +17,15 @@ const newItem = ref<Partial<CurriculumWeek>>({
 })
 
 const week = computed({
-  get: () => editingItem.value ? editingItem.value.week : newItem.value.week,
+  get: () => {
+    const initialWeek = curriculumStore.weeks.length + 1;
+    return editingItem.value ? editingItem.value.week : (newItem.value.week ?? initialWeek);
+  },
   set: (value: number) => {
     if (editingItem.value) {
-      editingItem.value.week = value
+      editingItem.value.week = value;
     } else {
-      newItem.value.week = value
+      newItem.value.week = value;
     }
   }
 })
@@ -63,7 +67,14 @@ const handleSave = async () => {
 
 const handleCreate = async () => {
   if (newItem.value.title && newItem.value.description) {
-    await curriculumStore.createWeek(newItem.value as CurriculumWeek)
+    let curriculum: CurriculumWeekRequestModel = {
+      week: newItem.value.week ?? 0,
+      title: newItem.value.title,
+      description: newItem.value.description
+
+    }
+    await curriculumStore.createWeek(curriculum)
+    await curriculumStore.fetchCurriculum()
     newItem.value = {
       week: curriculumStore.weeks.length + 1,
       title: '',
@@ -71,14 +82,17 @@ const handleCreate = async () => {
     }
   }
 }
+
+onMounted(() => {
+  curriculumStore.fetchCurriculum()
+})
 </script>
 
 <template>
   <div>
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-2xl font-bold">Curriculum Manager</h1>
-      <button 
-        @click="isEditing = !isEditing"
+      <button @click="isEditing = !isEditing"
         class="px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors">
         {{ isEditing ? 'Cancel' : 'Add Week' }}
       </button>
@@ -90,44 +104,24 @@ const handleCreate = async () => {
       <form @submit.prevent="editingItem ? handleSave() : handleCreate()" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Week Number</label>
-          <input
-            v-model.number="week"
-            type="number"
-            required
-            min="1"
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          />
+          <input v-model.number="week" type="number" required min="1" class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Title</label>
-          <input
-            v-model="title"
-            type="text"
-            required
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          />
+          <input v-model="title" type="text" required class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-400 mb-1">Description</label>
-          <textarea
-            v-model="description"
-            rows="3"
-            required
-            class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
-                   focus:outline-none focus:border-primary transition-colors"
-          ></textarea>
+          <textarea v-model="description" rows="3" required class="w-full px-4 py-2 bg-black/50 border border-gray-800 rounded-lg
+                   focus:outline-none focus:border-primary transition-colors"></textarea>
         </div>
 
-        <button
-          type="submit"
-          :disabled="curriculumStore.isLoading"
-          class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg
-                 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button type="submit" :disabled="curriculumStore.isLoading" class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg
+                 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <span v-if="!curriculumStore.isLoading">{{ editingItem ? 'Save Changes' : 'Create Week' }}</span>
           <LoadingSpinner v-else size="sm" />
         </button>
@@ -139,11 +133,9 @@ const handleCreate = async () => {
       <LoadingSpinner size="lg" />
       <p class="mt-4 text-gray-400">Loading curriculum...</p>
     </div>
-    
+
     <div v-else class="space-y-4">
-      <div v-for="item in curriculumStore.weeks" 
-           :key="item.week"
-           class="bg-gray-900/50 backdrop-blur-sm p-6 rounded-lg border border-gray-800
+      <div v-for="item in curriculumStore.weeks" :key="item.week" class="bg-gray-900/50 backdrop-blur-sm p-6 rounded-lg border border-gray-800
                   flex items-center justify-between">
         <div>
           <div class="flex items-center gap-4 mb-2">
@@ -152,9 +144,7 @@ const handleCreate = async () => {
           </div>
           <p class="text-gray-400 text-sm">{{ item.description }}</p>
         </div>
-        <button 
-          @click="handleEdit(item)"
-          class="px-4 py-2 text-primary hover:text-white transition-colors">
+        <button @click="handleEdit(item)" class="px-4 py-2 text-primary hover:text-white transition-colors">
           Edit
         </button>
       </div>

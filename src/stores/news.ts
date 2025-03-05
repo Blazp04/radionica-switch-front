@@ -12,20 +12,6 @@ export const useNewsStore = defineStore("news", () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const createNews = async (newsItem: NewsItem) => {
-    isLoading.value = true;
-    error.value = null;
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      news.value.unshift(newsItem);
-    } catch (e) {
-      error.value = "Failed to create news";
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
   const updateNews = async (updatedItem: NewsItem) => {
     isLoading.value = true;
     error.value = null;
@@ -86,7 +72,6 @@ export const useNewsStore = defineStore("news", () => {
     error,
     addNewNews,
     fetchNews: loadNews,
-    createNews,
     updateNews,
   };
 });
